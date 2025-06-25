@@ -59,46 +59,59 @@ scheduler_thread.start()
 def index():
     """Renders the main homepage."""
     return render_template('index.html')
-
 @app.route('/convert', methods=['POST'])
-def convert():
-    """Handles the conversion request."""
+def convert_video():
+    """API endpoint to convert YouTube video to MP3."""
     data = request.get_json()
     url = data.get('url')
 
     if not url:
-        return jsonify({"error": "URL is required."}), 400
+        return jsonify({'error': 'URL is required'}), 400
 
     try:
+        # yt-dlp options
         ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-    'outtmpl': os.path.join(app.config['DOWNLOADS_FOLDER'], '%(id)s.%(ext)s'),
-    'noplaylist': True,
-    'quiet': True,
-    'geo_bypass': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': True,
-    'force_generic_extractor': False,
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+            'outtmpl': os.path.join(app.config['DOWNLOADS_FOLDER'], '%(id)s.%(ext)s'),
+            'noplaylist': True,
+            'quiet': True,
+            'geo_bypass': True,
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
+            'force_generic_extractor': False,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
+            # We don't download here, just extract info to check first
+            info_dict = ydl.extract_info(url, download=False)
             video_id = info_dict.get('id', None)
-            video_title = info_dict.get('title', None)
-            thumbnail = info_dict.get('thumbnail', None)
+            video_title = info_dict.get('title', 'Unknown Title')
+            thumbnail_url = info_dict.get('thumbnail', None)
 
-            # Construct the filename yt-dlp would have created
-            filename = f"{video_id}.mp3"
-            
-            # This is a safe check in case something unexpected happened
-            if not os.path.exists(os.path.join(app.config['DOWNLOAD_FOLDER'], filename)):
-                 return jsonify({"error": "Conversion failed on the server."}), 500
+            # Now, trigger the download and conversion
+            ydl.download([url])
 
+            mp3_filename = f"{video_id}.mp3"
+            download_path = f"/download/{mp3_filename}"
+
+            response_data = {
+                'title': video_title,
+                'thumbnail': thumbnail_url,
+                'file': download_path
+            }
+            return jsonify(response_data)
+
+    except Exception as e:
+        import traceback
+        print("==== SERVER ERROR START ====")
+        print(traceback.format_exc())
+        print("==== SERVER ERROR END ====")
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
             return jsonify({
                 "title": video_title,
