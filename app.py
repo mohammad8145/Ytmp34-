@@ -57,19 +57,22 @@ def convert_video():
     try:
         # yt-dlp options
         ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'outtmpl': os.path.join(app.config['DOWNLOADS_FOLDER'], '%(id)s.%(ext)s'),
-            'noplaylist': True,
-            'quiet': True,
-            'geo_bypass': True,
-            'nocheckcertificate': True,
-            'ignoreerrors': True,
-            'force_generic_extractor': False,
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }],
+    'outtmpl': os.path.join(app.config['DOWNLOADS_FOLDER'], '%(id)s.%(ext)s'),
+    'noplaylist': True,
+    'quiet': True,
+    'geo_bypass': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': True,
+    'force_generic_extractor': False,
+    'http_headers': {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+    },
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
