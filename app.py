@@ -34,7 +34,8 @@ def cleanup_old_files():
         except Exception as e:
     import traceback
     print("==== SERVER ERROR START ====")
-    print(traceback.format_exc())  # 🔍 full traceback in Render logs
+    print(traceback.format_exc()) 
+    # Print the full error in Render logs
     print("==== SERVER ERROR END ====")
     return jsonify({'error': 'An internal server error occurred.'}), 500
 
