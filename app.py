@@ -32,7 +32,11 @@ def cleanup_old_files():
                     os.remove(file_path)
                     print(f"Deleted old file: {filename}")
         except Exception as e:
-            print(f"Error deleting file {file_path}: {e}")
+    import traceback
+    print("==== SERVER ERROR START ====")
+    print(traceback.format_exc())  # 🔍 full traceback in Render logs
+    print("==== SERVER ERROR END ====")
+    return jsonify({'error': 'An internal server error occurred.'}), 500
 
 # --- Scheduler Setup ---
 
