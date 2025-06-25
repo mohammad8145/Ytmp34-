@@ -1,64 +1,50 @@
 import os
-import json
-import threading
 import schedule
+import threading
 import time
-from datetime import datetime, timedelta
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 import yt_dlp
 
-app = Flask(__name__)
-DOWNLOAD_FOLDER = 'downloads'
-os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
-app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
+# --- Basic Flask App Setup ---
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# --- File Cleanup Logic ---
+# --- Configuration ---
+DOWNLOADS_FOLDER = 'downloads'
+app.config['DOWNLOADS_FOLDER'] = DOWNLOADS_FOLDER
+os.makedirs(DOWNLOADS_FOLDER, exist_ok=True)
 
+# --- File Cleanup Scheduler ---
 def cleanup_old_files():
-    """Deletes files in the download folder older than 24 hours."""
-    print("Running cleanup job...")
+    """Deletes files in the downloads folder older than 24 hours."""
+    print("Running scheduled cleanup...")
     now = time.time()
-    twenty_four_hours = 24 * 60 * 60
-    
-    for filename in os.listdir(app.config['DOWNLOAD_FOLDER']):
-        file_path = os.path.join(app.config['DOWNLOAD_FOLDER'], filename)
-        # Avoid deleting the .gitkeep file
-        if filename == '.gitkeep':
-            continue
-        try:
-            if os.path.isfile(file_path):
-                file_age = now - os.path.getmtime(file_path)
-                if file_age > twenty_four_hours:
+    for filename in os.listdir(DOWNLOADS_FOLDER):
+        file_path = os.path.join(DOWNLOADS_FOLDER, filename)
+        if os.path.isfile(file_path):
+            file_mod_time = os.path.getmtime(file_path)
+            if (now - file_mod_time) > 86400:  # 24 hours
+                try:
                     os.remove(file_path)
                     print(f"Deleted old file: {filename}")
-        except Exception as e:
-             import traceback
-             print("==== SERVER ERROR START ====")
-             print(traceback.format_exc())  # Print the full error in Render logs
-             print("==== SERVER ERROR END ====")
-              return jsonify({'error': 
-    'An internal server error occurred.'}), 500
-# --- Scheduler Setup ---
+                except Exception as e:
+                    print(f"Error deleting file {filename}: {e}")
+
+# Run cleanup every day at 3 AM.
+schedule.every().day.at("03:00").do(cleanup_old_files)
 
 def run_scheduler():
-    """Sets up and runs the scheduled tasks in a separate thread."""
-    # Schedule the cleanup job to run once every day
-    schedule.every(1).day.at("04:00").do(cleanup_old_files)
+    """Runs the scheduler in a separate thread."""
     while True:
         schedule.run_pending()
-        time.sleep(60) # check every minute
-
-# Start the scheduler in a background thread
-scheduler_thread = threading.Thread(target=run_scheduler)
-scheduler_thread.daemon = True
-scheduler_thread.start()
+        time.sleep(60)
 
 # --- Flask Routes ---
 
 @app.route('/')
 def index():
-    """Renders the main homepage."""
+    """Render the main page."""
     return render_template('index.html')
+
 @app.route('/convert', methods=['POST'])
 def convert_video():
     """API endpoint to convert YouTube video to MP3."""
@@ -87,13 +73,11 @@ def convert_video():
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # We don't download here, just extract info to check first
             info_dict = ydl.extract_info(url, download=False)
             video_id = info_dict.get('id', None)
             video_title = info_dict.get('title', 'Unknown Title')
             thumbnail_url = info_dict.get('thumbnail', None)
 
-            # Now, trigger the download and conversion
             ydl.download([url])
 
             mp3_filename = f"{video_id}.mp3"
@@ -113,37 +97,20 @@ def convert_video():
         print("==== SERVER ERROR END ====")
         return jsonify({'error': 'An internal server error occurred.'}), 500
 
-            return jsonify({
-                "title": video_title,
-                "thumbnail": thumbnail,
-                "file": f"/download/{filename}"
-            })
-
-    except yt_dlp.utils.DownloadError as e:
-        # This catches invalid URLs, private videos, etc.
-        return jsonify({"error": "Invalid YouTube URL or video is unavailable."}), 400
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return jsonify({"error": "An internal server error occurred."}), 500
-
-
 @app.route('/download/<filename>')
 def download_file(filename):
-    """Serves the converted MP3 file for download."""
-    # Sanitize filename to prevent directory traversal
-    if '..' in filename or filename.startswith('/'):
-        return "Invalid filename", 400
-    
+    """Serve the converted MP3 file for download."""
     try:
         return send_from_directory(
-            app.config['DOWNLOAD_FOLDER'], 
-            filename, 
+            app.config['DOWNLOADS_FOLDER'],
+            filename,
             as_attachment=True
         )
     except FileNotFoundError:
-        return "File not found.", 404
+        return jsonify({'error': 'File not found.'}), 404
 
-
+# --- Main Execution ---
 if __name__ == '__main__':
-    # Using Gunicorn is recommended for production, but this works for development
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+    scheduler_thread.start()
+    app.run(host='0.0.0.0', port=5000, debug=True)
