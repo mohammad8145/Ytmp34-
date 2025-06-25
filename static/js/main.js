@@ -65,10 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const youtubeURL = urlInput.value.trim();
 
-        if (!youtubeURL) {
-            showError('Please paste a YouTube URL.');
-            return;
-        }
+const youtubePattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i;
+if (!youtubeURL || !youtubePattern.test(youtubeURL)) {
+    showError('Please paste a valid YouTube URL.');
+    return;
+}
 
         showLoader();
 
