@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>YouTube to MP3 Converter – Fast, Free & No Ads</title>
+    <meta name="description" content="Use our fast, free, and ad-free YouTube to MP3 converter. Convert any YouTube video to high-quality audio with our online tool. It's the best YouTube video to audio converter, even better than an AI online solution.">
+    <meta name="keywords" content="youtube to mp3 converter, youtube video to audio converter, convert youtube to mp3, youtube downloader, youtube video to audio converter ai online, free youtube converter, high quality mp3">
+    
+    <!-- Open Graph Meta Tags (for social sharing) -->
+    <meta property="og:title" content="YouTube to MP3 Converter – Fast, Free & No Ads">
+    <meta property="og:description" content="Quickly convert YouTube videos to MP3 audio files for free. Our converter is fast, secure, and generates high-quality audio without any ads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="YOUR_WEBSITE_URL_HERE"> <!-- Replace with your domain -->
+    <meta property="og:image" content="/static/assets/og-image.jpg"> <!-- Optional: Add a social sharing image -->
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1>YouTube to MP3 Converter</h1>
+            <p class="subtitle">Fast, Free & No Ads</p>
+        </div>
+        <button id="theme-toggle" aria-label="Toggle light and dark mode">
+            <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.836 17.836a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 21a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V21a.75.75 0 01-.75.75zM5.106 18.894a.75.75 0 010-1.06l1.591-1.591a.75.75 0 011.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 5.106a.75.75 0 011.06 0l1.591 1.591a.75.75 0 01-1.06 1.06L5.106 6.164a.75.75 0 010-1.06z"></path></svg>
+            <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.943.75.75 0 01.82.162a10.5 10.5 0 11-15.341-8.54.75.75 0 01.819.162z" clip-rule="evenodd"></path></svg>
+        </button>
+    </header>
+    
+    <main class="container">
+        <div class="converter-box">
+            <form id="converter-form">
+                <input type="url" id="youtube-url" placeholder="Paste YouTube link here..." required>
+                <button type="submit" id="convert-btn">Convert to MP3</button>
+            </form>
+            <div id="loader" class="hidden">
+                <div class="spinner"></div>
+                <p>Converting, please wait...</p>
+            </div>
+            <div id="result" class="hidden">
+                <img id="thumbnail" src="" alt="Video Thumbnail">
+                <div class="video-info">
+                    <h3 id="video-title"></h3>
+                    <a id="download-btn" href="#" class="button-download" download>
+                        Download MP3
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.905 3.129V2.75z"></path><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"></path></svg>
+                    </a>
+                </div>
+            </div>
+             <div id="error-message" class="hidden alert-error"></div>
+        </div>
+        
+        <section class="info-section">
+            <h2>Frequently Asked Questions (FAQs)</h2>
+            <details>
+                <summary>Is this YouTube to MP3 converter free?</summary>
+                <p>Yes, absolutely. Our service is 100% free to use with no hidden costs or subscription fees. We believe in providing a straightforward tool for everyone. There are no limits on the number of conversions.</p>
+            </details>
+            <details>
+                <summary>Is it legal and safe to use?</summary>
+                <p>The legality depends on the copyright status of the video and the terms of service of YouTube in your country. You should only convert videos for which you have permission from the copyright holder. Our tool is completely safe to use; we don't store your data, and all connections are secure. The downloaded files are free of viruses and malware.</p>
+            </details>
+            <details>
+                <summary>How does it work?</summary>
+                <p>It's simple. You paste a YouTube video URL into the input box, and our server fetches the video. We then extract the audio track, convert it to a high-quality 192kbps MP3 file, and provide you with a direct download link. The entire process is automated and takes only a few seconds.</p>
+            </details>
+        </section>
+    </main>
+
+    <footer class="main-footer seo-content">
+        <div class="container">
+            <h2>The Ultimate YouTube to MP3 Converter for High-Quality Audio</h2>
+            <p>Welcome to the most efficient and user-friendly <strong>youtube to mp3 converter</strong> available online. Our platform is designed for music lovers, podcasters, and anyone who needs to extract audio from video content quickly and without hassle. We understand the need for a reliable tool that is not only fast but also respects your privacy and provides superior audio quality. That's why we created this service: a completely free, ad-free, and powerful solution for all your audio conversion needs. Whether you are looking for a simple way to listen to your favorite YouTube tracks offline or need an audio clip for a project, our tool is the perfect choice.</p>
+            
+            <h3>Why Choose Our YouTube Video to Audio Converter?</h3>
+            <p>In a sea of online converters, our <strong>youtube video to audio converter</strong> stands out for several key reasons. Firstly, we prioritize speed. Our backend is optimized to process your requests in seconds, minimizing your waiting time. Secondly, quality is non-negotiable. We convert audio to the MP3 format at a 192kbps bitrate, which offers an excellent balance between file size and crystal-clear sound fidelity. This ensures that you get high-quality audio that's perfect for any listening device. Thirdly, our platform is completely free from annoying ads, pop-ups, and trackers, providing a clean and safe user experience. You won't be redirected or asked to install any unwanted software. Our commitment is to provide a pure, functional service.</p>
+            
+            <p>Our goal is to be the best <strong>youtube to mp3 converter</strong> online, and we achieve this by focusing on the user experience. The interface is intuitive—just paste a link and click a button. There's no registration required, and you can start converting immediately. This makes us an ideal tool for quick, on-the-fly conversions. The rise of sophisticated tools like a <strong>youtube video to audio converter ai online</strong> might seem appealing, but they often come with complexities or costs. Our tool strips away the unnecessary features and focuses on one thing: delivering your MP3 file efficiently.</p>
+            
+            <h3>Seamless Conversion for Everyone</h3>
+            <p>Our service is designed to be accessible to everyone, regardless of their technical expertise. The process is straightforward: find the YouTube video you want, copy its URL, paste it into our converter, and click "Convert." In just a moment, you’ll see the video's thumbnail and title, confirming you've got the right one. A download button will appear, allowing you to save the MP3 file directly to your device. This makes our tool an exceptional <strong>youtube video to audio converter</strong>, suitable for saving music, lectures, interviews, and podcast episodes. The convenience of having these audio files on your phone or computer for offline listening is unmatched, especially for commuting, exercising, or traveling.</p>
+            
+            <p>Furthermore, we have optimized our platform for performance on both desktop and mobile devices. The responsive design ensures that you have a great experience whether you are on a computer, tablet, or smartphone. This flexibility solidifies our position as a leading <strong>youtube to mp3 converter</strong>. You don’t need to be at your desk to use our service. Imagine hearing a song you love while on the go; you can instantly convert and download it right from your phone. This seamless functionality is what sets us apart from other services, including those that label themselves as a next-generation <strong>youtube video to audio converter ai online</strong> but fail to deliver a smooth mobile experience. Our focus remains on practical, real-world usability for everyone, everywhere.</p>
+        </div>
+    </footer>
+    
+    <audio id="success-sound" src="/static/assets/success.mp3" preload="auto"></audio>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
